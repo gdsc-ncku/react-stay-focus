@@ -1,41 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import { getSettings } from '../../chromeApiHelpers';
 import QuestionUnlock from './QuestionUnlock';
 import PasswordUnlock from './PasswordUnlock';
-import CardWithLogo from '../../sharedComponents/CardWithLogo';
 import ClickButtonUnlock from './ClickButtonUnlock';
+import CardWithLogo from '../../sharedComponents/CardWithLogo';
+import { localStorage, setLocalStorage } from "../../chromeApiHelpers";
 
-const UnlockPage = () => {
-  const [lockSettings, setLockSettings] = useState({});
+export default class UnlockPage extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      lockSettings: {}
+    }
+  }
 
-  // useEffect(() => {
-  //   getSettings('settings').then(settings => {
-  //     setLockSettings(settings.lock);
-  //   });
-  // }, []);
+  componentDidMount() {
+    localStorage.get("settings").then(settings => {
+      this.setState({lockSettings : settings.lock});
+      console.log("lockSettings", this.state.lockSettings);
+    })
+  }
 
-  // const handleUnlock = () => {
-  //   setItem('active', false);
-  //   // Assuming there's a prop or state to handle unlocking in the parent component
-  //   // You may need to adjust this part based on your application structure
-  //   // e.g., this.props.onUnlock() or setUnlock(true)
-  // };
+  handleUnlock() {
+    localStorage.set("active", false);
+    // this.$emit('unlock');
+  }
 
-  const lockComponentName = lockSettings.type ? `${lockSettings.type}-unlock` : '';
-
+  lockComponentName() {
+    console.log("jfisdfj", this.state.lockSettings);
+    return this.state.lockSettings.type + "-unlock"
+  }
+  
+  render() {
   return (
     <CardWithLogo>
-      {lockComponentName && (
-        <Component
-          lockSettings={lockSettings}
-          handleUnlock={handleUnlock}
-          is={lockComponentName === 'question' ? QuestionUnlock :
-              lockComponentName === 'password' ? PasswordUnlock : 
-              lockComponentName === 'click-button' ? ClickButtonUnlock : null}
-        />
+      {this.state.lockSettings.type && this.lockComponentName() === "password-unlock" && (
+          <div>Password</div> 
+          // <PasswordUnlock />
+      )}
+
+      {this.state.lockSettings.type && this.lockComponentName() === "question-unlock" && (
+          <QuestionUnlock />
+      )}
+
+      {this.state.lockSettings.type && this.lockComponentName() === "click-button-unlock" && (
+          <ClickButtonUnlock />
       )}
     </CardWithLogo>
-  );
+  )};
 };
-
-export default UnlockPage;
