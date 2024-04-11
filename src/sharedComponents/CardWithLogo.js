@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent } from '@material-ui/core'; // Assuming you're using Material-UI for the card components
 
-const SharedCard = ({ header, media, actions, children }) => {
+const CardWithLogo = ({ header, media, children }) => {
   return (
     <Card style={{borderRadius: '4px'}}>
       {header && 
