@@ -21,9 +21,10 @@ export default class UnlockPage extends Component {
     })
   }
 
-  handleUnlock() {
+  handleUnlock = () => {
     localStorage.set("active", false);
-    // this.$emit('unlock');
+    console.log("unlock was invoke", this.props);
+    this.props.handleUnlock();
   }
 
   lockComponentName() {
@@ -44,7 +45,7 @@ export default class UnlockPage extends Component {
       )}
 
       {this.state.lockSettings.type && this.lockComponentName() === "click-button-unlock" && (
-          <ClickButtonUnlock />
+          <ClickButtonUnlock lockSettings={this.state.lockSettings} handleUnlock={this.handleUnlock}/>
       )}
     </CardWithLogo>
   )};

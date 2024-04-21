@@ -1,45 +1,47 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 
-const ClickButtonUnlock = ({ lockSettings, onUnlock }) => {
-    const [clicksLeft, setClicksLeft] = useState(lockSettings.clickButtonCounts);
-    const [buttonPositionStyle, setButtonPositionStyle] = useState({
-        textAlign: "center",
-    });
+class ClickButtonUnlock extends Component {
+    constructor(props) {
+        super(props);
+        console.log("clickbutton props", props);
+        this.state = {
+            clicksLeft: this.props.lockSettings.clickButtonCounts,
+            buttonPositionStyle: { textAlign: "center" }
+        };
+    }
 
-    const handleClick = () => {
-        setClicksLeft(prevClicks => prevClicks - 1);
-        updateButtonPosition();
-        if (clicksLeft <= 0) {
-            onUnlock();
+    handleClick = () => {
+        this.setState({ clicksLeft: this.state.clicksLeft - 1 });
+        this.updateButtonPosition();
+        console.log("clicksLeft", this.state.clicksLeft);
+        if (this.state.clicksLeft <= 0) {
+            this.props.handleUnlock();
+            console.log("unlock invoked")
         }
     };
 
-    const updateButtonPosition = () => {
+    updateButtonPosition = () => {
         const availablePositions = ['center', 'left', 'right'];
-        setButtonPositionStyle({
-            textAlign: availablePositions[Math.floor(Math.random() * availablePositions.length)]
+        this.setState({
+            buttonPositionStyle: {
+                textAlign: availablePositions[Math.floor(Math.random() * availablePositions.length)]
+            }
         });
     };
 
-    return (
-        <div>
-            <div className="md-layout">
-                <div style={buttonPositionStyle} className="md-layout-item">
-                    <button
-                        onKeyDown={e => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                            }
-                        }}
-                        onClick={handleClick}
-                        className="md-raised md-accent"
-                    >
-                        {clicksLeft} clicks to unlock
-                    </button>
+    render() {
+        return (
+            <div>
+                <div className="md-layout">
+                    <div style={this.state.buttonPositionStyle} className="md-layout-item">
+                        <button onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') e.preventDefault(); }} onClick={this.handleClick} className="md-raised md-accent">
+                            {this.state.clicksLeft} clicks to unlock
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default ClickButtonUnlock;

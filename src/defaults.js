@@ -11,7 +11,7 @@ export let settingsDefault = {
         type: "click-button", /*types are: question,click-button, password, none*/
         password: "",
         questionNumberOfTries: 3,
-        clickButtonCounts: 8, // how many times the user has to click the button to unlock
+        clickButtonCounts: 3, // how many times the user has to click the button to unlock
     }
 };
 
