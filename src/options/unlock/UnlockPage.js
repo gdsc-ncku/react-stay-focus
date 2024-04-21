@@ -36,7 +36,7 @@ export default class UnlockPage extends Component {
   return (
     <CardWithLogo>
       {this.state.lockSettings.type && this.lockComponentName() === "password-unlock" && (
-          <div>Password</div> 
+          <PasswordUnlock lockSettings={this.state.lockSettings} handleUnlock={this.handleUnlock}/> 
           // <PasswordUnlock />
       )}
 

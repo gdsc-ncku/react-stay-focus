@@ -1,59 +1,43 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 
-const PasswordUnlock = ({ lockSettings, onUnlock }) => {
-  const [password, setPassword] = useState('');
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-
-  const handleUnlock = () => {
-    if (password.toLowerCase() === lockSettings.password.toLowerCase()) {
-      onUnlock();
-    } else {
-      setShowErrorMessage(true);
+class PasswordUnlock extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            password: "",
+            showErrorMessage: false,
+        };
     }
-  };
 
-  return (
-    <div>
-      <div className="md-layout">
-        <div className="md-layout-item">
-          {lockSettings.password === '' ? (
+    handleUnlock = () => {
+        if (this.state.password.toLowerCase() === this.props.lockSettings.password.toLowerCase()) {
+            this.props.handleUnlock();
+        } else {
+            this.setState({ showErrorMessage: true });
+        }
+    };
+
+    render() {
+        return (
             <div>
-              <p>You haven't set a password yet! Go to settings to set it.</p>
-              <button className="md-raised md-accent" onClick={onUnlock}>Go To setting</button>
-            </div>
-          ) : (
-            <div>
-              <label>Enter Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyUp={(e) => {
-                  if (e.key === 'Enter') {
-                    handleUnlock();
-                  }
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+                <div>
+                    {this.props.lockSettings.password === '' ? (
+                        <div>
+                            <p>You haven't set a password yet! go to setting to set it.</p>
+                            <button onClick={this.props.handleUnlock}>Go To setting</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <label>Enter Password</label>
+                            <input value={this.state.password} onChange={e => this.setState({ password: e.target.value })} onKeyUp={e => e.key === 'Enter' && this.handleUnlock()} />
+                        </div>
+                    )}
+                </div>
 
-      {showErrorMessage && (
-        <div className="md-snackbar" style={{ position: 'center', duration: 4000 }}>
-          <span>Wrong Password!</span>
-        </div>
-      )}
-    </div>
-  );
-};
-
-PasswordUnlock.propTypes = {
-  lockSettings: PropTypes.shape({
-    password: PropTypes.string.isRequired,
-  }).isRequired,
-  onUnlock: PropTypes.func.isRequired,
-};
+                {this.state.showErrorMessage && <div>Wrong Password!</div>}
+            </div>
+        );
+    }
+}
 
 export default PasswordUnlock;
