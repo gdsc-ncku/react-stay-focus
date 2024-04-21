@@ -8,7 +8,7 @@ export let settingsDefault = {
     },
     allowFunnyGoBackImages: true,
     lock: {
-        type: "click-button", /*types are: question,click-button, password, none*/
+        type: "question", /*types are: question,click-button, password, none*/
         password: "",
         questionNumberOfTries: 3,
         clickButtonCounts: 3, // how many times the user has to click the button to unlock
