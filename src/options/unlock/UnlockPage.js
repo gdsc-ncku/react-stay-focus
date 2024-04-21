@@ -41,7 +41,7 @@ export default class UnlockPage extends Component {
       )}
 
       {this.state.lockSettings.type && this.lockComponentName() === "question-unlock" && (
-          <QuestionUnlock />
+          <QuestionUnlock lockSettings={this.state.lockSettings} handleUnlock={this.handleUnlock}/>
       )}
 
       {this.state.lockSettings.type && this.lockComponentName() === "click-button-unlock" && (
