@@ -11,10 +11,27 @@ import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Toolbar from '@mui/material/Toolbar';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
+import SpellcheckIcon from '@mui/icons-material/Spellcheck';
+import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
+import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
 import UnlockPage from "./unlock/UnlockPage";
 // import SocialMediaShare from "../sharedComponents/SocialMediaShare";
 
 export default class App extends Component {
+    drawerWidth = 240;
+
     constructor(props) {
       super(props)
       this.state = {
@@ -31,7 +48,8 @@ export default class App extends Component {
       console.log("loading success")
     }
     selectTab(tabName) {
-      this.state.selectedTab = tabName
+      console.log("now setting to", tabName);
+      this.setState({selectedTab : tabName});
     }
     isSelectedTab(tabName) {
       return this.state.selectedTab === tabName
@@ -74,6 +92,19 @@ export default class App extends Component {
       this.setState({active: !active});
     }
 
+    generateTab = (text, text_id, icon) => {
+      return <List>
+        <ListItem>
+          <ListItemButton onClick={() => this.selectTab(text_id)}>
+            <ListItemIcon>
+              {icon}
+            </ListItemIcon>
+            <ListItemText primary={text} />
+          </ListItemButton>
+        </ListItem>
+      </List>;
+    }
+
     render() {
     return (
       <div className='page-container'>
@@ -86,25 +117,45 @@ export default class App extends Component {
         )}
 
         {!this.state.loading && !this.state.isLocked && (
-          <div>
-            <div>123</div>
-            <AppBar position="static" className='md-primary' >
+          <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <AppBar position="fixed" sx={{width: { sm: `calc(100% - ${this.drawerWidth}px)` , }, 
+                                                      ml: { sm: `${this.drawerWidth}px` }}}>
               <Toolbar>
-                <Typography className='md-title' sx={{ flexGrow: 1 }}>
-                  Stay Focused
-                </Typography>
-                <FormControlLabel control={<Switch checked={this.state.active} 
-                                                    onChange={(e) => {this.saveActive(e.target.checked), this.handlchange(this.state.active)}}
-                                                    color="warning"
-                                            />}
-                                  label={this.state.active? "Active": "Inactive"}
-                />
+                <Typography className='md-title' sx={{ flexGrow: 1 }} noWrap component="div">Stay Focused</Typography>
+                <FormControlLabel control={<Switch checked={this.state.active} onChange={(e) => {this.saveActive(e.target.checked), this.handlchange(this.state.active)}}
+                                                    color="warning"/>}
+                                  label={this.state.active? "Active": "Inactive"}/>
               </Toolbar>
             </AppBar>
-          </div>
-        )}
+            
+            <Box
+              component="nav"
+              sx={{ width: { sm: this.drawerWidth }, flexShrink: { sm: 0 } }}
+              aria-label="mailbox folders"
+            >
+              <Drawer anchor="left"
+                      variant="permanent"
+                      sx={{
+                        display: 'block',
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: this.drawerWidth },
+                      }}>
 
-        {<div> isLocked: {this.state.isLocked} </div>}
+                {this.generateTab("Block by Website", "block-by-website-tab", <MoveToInboxIcon />)}
+                {this.generateTab("Block By Word", "block-by-word-tab", <StickyNote2Icon />)}
+                {this.generateTab("Block By Regex", "block-by-regex-tab", <SpellcheckIcon />)}
+                {this.generateTab("Settings", "settings-tab", <SettingsIcon />)}
+                {this.generateTab("About", "about-tab", <InfoIcon />)}
+              </Drawer>
+              </Box>
+
+              <Box component="nav" sx={{ display: 'flex', paddingTop: 5}}>
+                  {this.state.selectedTab == "settings-tab" && (
+                    <div>test</div>
+                  )}
+              </Box>
+          </Box>
+        )}
       </div>
     )
     }
