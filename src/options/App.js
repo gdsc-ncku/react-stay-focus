@@ -95,6 +95,7 @@ export default class App extends Component {
                 </Typography>
                 <FormControlLabel control={<Switch checked={this.state.active} 
                                                     onChange={(e) => {this.saveActive(e.target.checked), this.handlchange(this.state.active)}}
+                                                    color="warning"
                                             />}
                                   label={this.state.active? "Active": "Inactive"}
                 />
