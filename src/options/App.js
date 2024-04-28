@@ -6,6 +6,10 @@ import BlockByWordTab from "./BlockItemTabs/BlockByWordTab";
 import BlockByRegexTab from "./BlockItemTabs/BlockByRegexTab";
 import { localStorage, setLocalStorage } from "../chromeApiHelpers";
 import CircularProgress from '@material-ui/core/CircularProgress'; //md-progress-spinner
+import AppBar from '@mui/material/AppBar';
+import Typography from '@mui/material/Typography';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import UnlockPage from "./unlock/UnlockPage";
 // import SocialMediaShare from "../sharedComponents/SocialMediaShare";
 
@@ -33,8 +37,8 @@ export default class App extends Component {
     }
     handleUnlock = () => {
       this.setState({isLocked : false})
-      this.state.active = false
-      console.log("unlock was invoked success", this.state.isLocked);
+      this.setState({active : false})
+      console.log("unlock was invoked success  in app.js", this.state.isLocked);
     }
     loadData = () => {
       localStorage.get("active")
@@ -55,6 +59,20 @@ export default class App extends Component {
         })
       })
     }
+
+    saveActive(active) {
+      localStorage.set("active", active);
+      localStorage.get("active")
+          .then(active => {
+          console.log("active is getting", active);
+          })
+      // setIcon(active);
+    };
+
+    handlchange = (active) => {
+      this.setState({active: !active});
+    }
+
     render() {
     return (
       <div className='page-container'>
@@ -62,9 +80,27 @@ export default class App extends Component {
           <CircularProgress className='loader' size={100} thickness={10}></CircularProgress>
         )}
 
-        {this.state.isLocked && (
+        {!this.state.loading && this.state.isLocked && (
           <UnlockPage handleUnlock={this.handleUnlock}></UnlockPage>
         )}
+
+        {!this.state.loading && !this.state.isLocked && (
+          <div>
+            <div>123</div>
+            <AppBar position="static" className='md-primary' >
+              <Typography className='md-title'>
+                Stay Focused
+              </Typography>
+              <FormControlLabel control={<Switch checked={this.state.active} 
+                                                  onChange={(e) => {this.saveActive(e.target.checked), this.handlchange(this.state.active)}}
+                                          />}
+                                label={this.state.active? "Active": "Inactive"}
+              />
+            </AppBar>
+          </div>
+        )}
+
+        {<div> isLocked: {this.state.isLocked} </div>}
       </div>
     )
     }

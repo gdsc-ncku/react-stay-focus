@@ -11,13 +11,15 @@ class ClickButtonUnlock extends Component {
     }
 
     handleClick = () => {
-        this.setState({ clicksLeft: this.state.clicksLeft - 1 });
+        console.log("clicksLeft prev", this.state.clicksLeft);
+        this.setState({ clicksLeft: this.state.clicksLeft - 1 }, () => {
+            if (this.state.clicksLeft <= 0) {
+                this.props.handleUnlock();
+                console.log("unlock invoked")
+            }
+            console.log("clicksLeft", this.state.clicksLeft);
+        });
         this.updateButtonPosition();
-        console.log("clicksLeft", this.state.clicksLeft);
-        if (this.state.clicksLeft <= 0) {
-            this.props.handleUnlock();
-            console.log("unlock invoked")
-        }
     };
 
     updateButtonPosition = () => {
