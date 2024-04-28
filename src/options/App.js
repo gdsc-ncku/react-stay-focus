@@ -10,6 +10,7 @@ import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Toolbar from '@mui/material/Toolbar';
 import UnlockPage from "./unlock/UnlockPage";
 // import SocialMediaShare from "../sharedComponents/SocialMediaShare";
 
@@ -88,14 +89,16 @@ export default class App extends Component {
           <div>
             <div>123</div>
             <AppBar position="static" className='md-primary' >
-              <Typography className='md-title'>
-                Stay Focused
-              </Typography>
-              <FormControlLabel control={<Switch checked={this.state.active} 
-                                                  onChange={(e) => {this.saveActive(e.target.checked), this.handlchange(this.state.active)}}
-                                          />}
-                                label={this.state.active? "Active": "Inactive"}
-              />
+              <Toolbar>
+                <Typography className='md-title' sx={{ flexGrow: 1 }}>
+                  Stay Focused
+                </Typography>
+                <FormControlLabel control={<Switch checked={this.state.active} 
+                                                    onChange={(e) => {this.saveActive(e.target.checked), this.handlchange(this.state.active)}}
+                                            />}
+                                  label={this.state.active? "Active": "Inactive"}
+                />
+              </Toolbar>
             </AppBar>
           </div>
         )}
