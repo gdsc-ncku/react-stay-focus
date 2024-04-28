@@ -9,6 +9,7 @@
   "author": "heyihuang",
   "description": "",
   "dependencies": {
+    "@mui/icons-material": "^5.15.15",
     "react": "^17.0.2",
     "react-css-modules": "^4.7.11",
     "react-devtools": "^5.0.2",
