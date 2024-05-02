@@ -42,7 +42,7 @@ class AddBlockItemToList extends React.Component {
         return (
             <div>
                 <Box sx={{
-                            '& .MuiTextField-root': { m: 1, width: '60ch' },
+                            '& .MuiTextField-root': { m: 1, width: '30ch' },
                         }}>
                         <TextField id="standard-basic" 
                                     label="Type your new website"
