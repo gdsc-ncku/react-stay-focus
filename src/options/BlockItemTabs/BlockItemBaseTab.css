@@ -1,0 +1,4 @@
+.sites-groups {
+    display: flex;
+    flex-flow: row wrap;
+}

@@ -1,99 +1,134 @@
-import React, { useState, useEffect } from 'react';
-import SitesGroup from './SitesGroup';
-import { websitesListDefault } from '../../defaults';
-import { getHostNameFromStringUrl } from '../../helpers';
-import { localStorage } from '../../chromeApiHelpers';
-import { getSiteGroupStructure, getSiteStructure } from '../../dataHelpers/SitesGroup';
-import MdColumn from '../../sharedComponents/MdColumn';
-import NoteBlock from '../../sharedComponents/NoteBlock';
+import React from 'react';
+import {websitesListDefault} from '../../defaults'
+import {getHostNameFromStringUrl} from "../../helpers";
+import {localStorage} from "../../chromeApiHelpers";
+import {getSiteGroupStructure, getSiteStructure} from "../../dataHelpers/SitesGroup";
+import SitesGroup from "./SitesGroup";
+import MdColumn from "../../sharedComponents/MdColumn";
+import NoteBlock from "../../sharedComponents/NoteBlock";
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import './BlockItemBaseTab.css';
+class BlockItemBaseTab extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            allowCreateNewGroups: props.allowCreateNewGroups || true,
+            blockTypeToShow: props.blockTypeToShow || true,
+            allowDeleteGroups: props.allowDeleteGroups || true,
 
-const BlockItemBaseTab = ({ allowCreateNewGroups = true, blockTypeToShow, allowDeleteGroups = true }) => {
-    const [sitesGroups, setSitesGroups] = useState(websitesListDefault);
-    const [newGroupName, setNewGroupName] = useState('');
+            sitesGroups: websitesListDefault,
+            newGroupName: "",
+        };
+        console.log('allowCreateNewGroups', this.state.allowCreateNewGroups)
+    }
+    componentDidMount() {
+        this.loadWebsites();
+    }
 
-    useEffect(() => {
-        loadWebsites();
-    }, []);
+    findGroupIndexByUid(uid) {
+        return this.state.sitesGroups.findIndex(sg => sg.uid === uid);
+    }
 
-    const toShowSitesGroups = sitesGroups.filter(sg => blockTypeToShow === sg.blockType);
-    const hasNote = React.Children.count(this.props.children) > 0;
+    loadWebsites() {
+        localStorage.get("sitesGroups").then(sitesGroups => {
+            this.setState({sitesGroups : sitesGroups});
+        }).catch(() => {
+            this.storeWebsites();
+        })
+    }
 
-    const findGroupIndexByUid = uid => sitesGroups.findIndex(sg => sg.uid === uid);
+    storeWebsites = () => {
+        localStorage.set("sitesGroups", this.state.sitesGroups);
+    }
 
-    const loadWebsites = () => {
-        localStorage.get('sitesGroups')
-            .then(sitesGroups => setSitesGroups(sitesGroups))
-            .catch(() => storeWebsites()); // initial run for the app will get default data
-    };
-
-    const storeWebsites = () => {
-        localStorage.set('sitesGroups', sitesGroups);
-    };
-
-    const addNewSite = (groupUid, siteData) => {
-        const groupIndex = findGroupIndexByUid(groupUid);
-        let { siteUrl, blockType } = siteData;
+    addNewSite(groupUid, siteData) {
+        let groupIndex = this.findGroupIndexByUid(groupUid);
+        let {siteUrl, blockType} = siteData;
         if (blockType === 'website') {
             siteUrl = getHostNameFromStringUrl(siteUrl);
         }
-        const group = sitesGroups[groupIndex];
+        let group = this.state.sitesGroups[groupIndex];
         group.sitesList = [getSiteStructure(siteUrl, true, blockType), ...group.sitesList];
-        storeWebsites();
-    };
+        this.storeWebsites();
+        console.log(this.state.sitesGroups)
+        this.setState({ sitesGroups: this.state.sitesGroups }); //rerender
+    }
 
-    const changeGroupStatus = groupIndex => {
-        storeWebsites();
-    };
+    addNewGroup() {
+        this.setState(prevState => ({
+            sitesGroups: [getSiteGroupStructure(prevState.newGroupName), ...prevState.sitesGroups],
+            newGroupName: ""
+        }), this.storeWebsites);
+    }
 
-    const addNewGroup = () => {
-        setSitesGroups([getSiteGroupStructure(newGroupName), ...sitesGroups]);
-        setNewGroupName('');
-        storeWebsites();
-    };
+    deleteGroup = (groupUid) => {
+        let groupIndex = this.findGroupIndexByUid(groupUid);
+        let newSitesGroups = [...this.state.sitesGroups];
+        newSitesGroups.splice(groupIndex, 1);
+        this.setState({ sitesGroups: newSitesGroups }, this.storeWebsites);
+    }
 
-    const deleteGroup = groupUid => {
-        const groupIndex = findGroupIndexByUid(groupUid);
-        sitesGroups.splice(groupIndex, 1);
-        storeWebsites();
-    };
-
-    const deleteSite = (groupUid, siteIndex) => {
-        const groupIndex = findGroupIndexByUid(groupUid);
+    deleteSite(groupUid, siteIndex) {
+        let groupIndex = this.findGroupIndexByUid(groupUid);
+        console.log('groupIndex', groupIndex)
         setTimeout(() => {
-            const group = sitesGroups[groupIndex];
+            let newSitesGroups = [...this.state.sitesGroups];
+            let group = newSitesGroups[groupIndex];
             group.sitesList.splice(siteIndex, 1);
-            storeWebsites();
-        }, 10);
-    };
+            this.setState({ sitesGroups: newSitesGroups }, this.storeWebsites);
+        }, 10)
+    }
 
-    const toggleSiteEnable = () => {
-        storeWebsites();
-    };
+    toShowSitesGroups() {
+        console.log(this.state.sitesGroups.filter(sg => this.state.blockTypeToShow === sg.blockType))
+        return this.state.sitesGroups.filter(sg => this.state.blockTypeToShow === sg.blockType);
+    }
 
-    return (
-        <div>
-            <NoteBlock class="note" type="warning" v-if={hasNote}>
-                {props.children}
-            </NoteBlock>
-            <MdColumn v-if={allowCreateNewGroups} class="enter-new-group-input" width={50}>
-                <label>Type the name of the new group of websites(ex: E-Commerce)</label>
-                <input onKeyUp={addNewGroup} value={newGroupName} onChange={e => setNewGroupName(e.target.value)} />
-            </MdColumn>
+    render() {
+        // const toShowSitesGroups = this.state.sitesGroups.filter(sg => this.props.blockTypeToShow === sg.blockType);
+        // const hasNote = !!this.props.children;
+
+        return (
+            <div>
+                {this.state.allowCreateNewGroups && (
+                    <>
+                    <Box sx={{
+                            '& .MuiTextField-root': { m: 1, width: '60ch' },
+                        }}>
+                        <TextField id="standard-basic" 
+                                    label="Type the name of the new group of websites(ex: E-Commerce)"
+                                    value={this.state.newGroupName}
+                                    variant="standard"
+                                    onChange={(e) => {this.setState({newGroupName : e.target.value})}}
+                                    onKeyUp={(e) => {
+                                        if (e.key === 'Enter') {
+                                            this.setState({newGroupName : e.target.value}, () => {
+                                            this.addNewGroup();
+                                            })
+                                        }
+                                    }} />
+                    </Box>
+                    </>
+                )}
+    
             <div className="sites-groups">
-                {toShowSitesGroups.map((sitesGroup, groupIndex) => (
+                {this.toShowSitesGroups().map((sitesGroup, groupIndex) => 
                     <SitesGroup
                         key={sitesGroup.uid}
                         sitesGroup={sitesGroup}
-                        allow-delete={allowDeleteGroups}
-                        store-websites={storeWebsites}
-                        add-new-website={siteData => addNewSite(sitesGroup.uid, siteData)}
-                        delete-sites-group={() => deleteGroup(sitesGroup.uid)}
-                        delete-site={siteIndex => deleteSite(sitesGroup.uid, siteIndex)}
-                    />
-                ))}
+                        allowDelete={this.state.allowDeleteGroups}
+                        storeWebsites={this.storeWebsites}
+                        addNewWebsite={(siteData) => this.addNewSite(sitesGroup.uid, siteData)}
+                        deleteSitesGroup={() => this.deleteGroup(sitesGroup.uid)}
+                        deleteSite={(siteIndex) => this.deleteSite(sitesGroup.uid, siteIndex)}
+                        >
+                        </SitesGroup>
+                )}
+                </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default BlockItemBaseTab;

@@ -1,42 +1,61 @@
-import React, { useState } from 'react';
-import { isValidURL } from '../../helpers';
+import React from 'react';
 import { blockTypes } from '../../constants';
+import { isValidURL } from "../../helpers";
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
 
-function AddBlockItemToList({ blockType, onAddNewWebsite }) {
-    const [siteUrl, setSiteUrl] = useState('');
-    
-    const isValidBlockItem = () => {
-        switch (blockType) {
+class AddBlockItemToList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            siteData: {
+                siteUrl: "",
+            }, 
+            blockType: props.blockType
+        };
+    }
+
+    isValidBlockItem = () => {
+        switch (this.state.blockType) {
             case "website":
-                return isValidURL(siteUrl);
+                return isValidURL(this.state.siteData.siteUrl);
             default:
                 return true;
         }
     };
-    
-    const handleEnterWebsite = () => {
-        if (siteUrl !== "" && isValidBlockItem()) {
-            onAddNewWebsite({ siteUrl });
-            setSiteUrl('');
-        }
-    };
 
-    return (
-        <div>
-            <div className="enter-website-field">
-                <label>Type your new website</label>
-                <input
-                    type="text"
-                    value={siteUrl}
-                    onChange={(e) => setSiteUrl(e.target.value)}
-                    onKeyUp={(e) => { if (e.key === 'Enter') handleEnterWebsite(); }}
-                />
+    handleEnterWebsite = (event) => {
+        if (event.key === 'Enter') {
+            console.log("handleEnterWebsite")
+            if (this.state.siteData.siteUrl !== "" && this.isValidBlockItem()) {
+                this.props.addNewWebsite(this.state.siteData);
+                this.setState({ siteData: { siteUrl: '' } });
+            }
+        }
+    }
+
+    blockTypes() {
+        return blockTypes;
+    }
+
+    render() {
+        return (
+            <div>
+                <Box sx={{
+                            '& .MuiTextField-root': { m: 1, width: '60ch' },
+                        }}>
+                        <TextField id="standard-basic" 
+                                    label="Type your new website"
+                                    value={this.state.siteData.siteUrl}
+                                    variant="standard"
+                                    onChange={(e) => {this.setState({siteData : {siteUrl: e.target.value}})}}
+                                    onKeyUp={(e) => {this.handleEnterWebsite(e)}
+                                    } />
+                    </Box>
+                {this.state.siteData.siteUrl !== '' && !this.isValidBlockItem() && <span className="md-error">Invalid Website</span>}
             </div>
-            {siteUrl !== '' && !isValidBlockItem() && (
-                <span className="md-error">Invalid Website</span>
-            )}
-        </div>
-    );
+        );
+    }
 }
 
 export default AddBlockItemToList;

@@ -6,7 +6,7 @@ const CardWithLogo = ({ header, media, children }) => {
     <Card style={{borderRadius: '4px'}}>
       {header && 
         
-        <CardHeader className={card-header} title={header}>
+        <CardHeader className="card-header" title={header}>
           <div id="logo-div"><img alt="logo" src="../images/logo-red.png" /></div>
         </CardHeader>
         }

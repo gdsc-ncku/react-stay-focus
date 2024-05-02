@@ -150,6 +150,12 @@ export default class App extends Component {
               </Box>
 
               <Box component="nav" sx={{ display: 'flex', paddingTop: 5}}>
+                  {this.state.selectedTab == "block-by-website-tab" && (
+                    <div>block-by-website-tab
+                      <BlockByWebsiteTab/>
+                    </div>
+                  )}
+
                   {this.state.selectedTab == "settings-tab" && (
                     <div>test</div>
                   )}
