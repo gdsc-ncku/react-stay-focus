@@ -169,7 +169,9 @@ export default class App extends Component {
                   )}
 
                   {this.state.selectedTab == "settings-tab" && (
-                    <div>setting</div>
+                    <div>
+                      <SettingsTab/>
+                    </div>
                   )}
               </Box>
           </Box>

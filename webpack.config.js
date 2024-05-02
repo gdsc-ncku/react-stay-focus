@@ -23,16 +23,70 @@ const config = {
   resolve: {
     extensions: ['.js', '.jsx']
   },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use:  {
+          loader: 'babel-loader', 
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+          }
+      }
+    },
+    {
+      test: /\.(css)$/,
+      exclude: /node_modules/,
+      use:  [MiniCssExtractPlugin.loader, 'css-loader']
+  },
+  {
+    test: /\.css$/,
+    use: [MiniCssExtractPlugin.loader, 'css-loader'],
+  },
+  {
+    test: /\.scss$/,
+    use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+  },
+  {
+    test: /\.sass$/,
+    use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax'],
+  },
+  {
+    test: /\.(png|jpg|jpeg|gif|svg|ico)$/,
+    loader: 'file-loader',
+    options: {
+      name: '[name].[ext]',
+      outputPath: '/images/',
+      emitFile: false,
+      esModule: false,
+    },
+  },
+  {
+    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+    loader: 'file-loader',
+    options: {
+      name: '[name].[ext]',
+      outputPath: '/fonts/',
+      emitFile: false,
+    },
+  }
+      // ... other rules
+    ],
+  },
   plugins: [
     // other plugins
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+    }),
     new CopyPlugin({
       patterns: [
         { from: 'icons', to: 'icons', globOptions: { ignore: ['**/icon.xcf'] } },
-        { from: 'popup/popup.html', to: 'popup/popup.html'},
-        { from: 'options/options.html', to: 'options/options.html'},
+        { from: 'popup/popup.html', to: 'popup/popup.html', transform: transformHtml},
+        { from: 'options/options.html', to: 'options/options.html', transform: transformHtml},
         { from: 'images', to: 'images' },
-        // { from: 'goback/goback.html', to: 'goback/goback.html'},
-        // { from: 'goback/images', to: 'goback/images' },
+        // { from: 'goback/goback.html', to: 'goback/goback.html', transform: transformHtml},
+        { from: 'goback/images', to: 'goback/images' },
         {
           from: 'manifest.json',
           to: 'manifest.json',
@@ -52,30 +106,12 @@ const config = {
       ]
     }),
   ],
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use:  {
-          loader: 'babel-loader', 
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
-          }
-      }
-    },
-    {
-      test: /\.(css)$/,
-      exclude: /node_modules/,
-      use:  [MiniCssExtractPlugin.loader, 'css-loader']
-  }
-      // ... other rules
-    ],
-  },
-  plugins: [
-    new MiniCssExtractPlugin(),
-    // ... other plugins
-  ]
 };
+
+function transformHtml(content) {
+  return ejs.render(content.toString(), {
+    ...process.env,
+  });
+}
 
 module.exports = config;

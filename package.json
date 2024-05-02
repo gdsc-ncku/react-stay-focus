@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "webpack.config.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack --watch"
+    "dev": "cross-env NODE_ENV=development webpack"
   },
   "keywords": [],
   "author": "heyihuang",
