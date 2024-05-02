@@ -28,7 +28,7 @@ class SitesGroup extends React.Component {
     render() {
         return (
             <div className="site-group">
-            <Card style={{borderRadius: '4px'}}>
+            <Card style={{borderRadius: '4px', margin: '4px', height: '500px'}}>
                 
                 <CardHeader className="card-header" title={this.state.sitesGroup.groupName} 
                             action={
@@ -56,7 +56,7 @@ class SitesGroup extends React.Component {
                             );
                         })}
                     <AddBlockItemToList blockType={this.state.sitesGroup.blockType} addNewWebsite={this.props.addNewWebsite}/>
-                    <FormGroup>
+                    <div style={{height: '300px', overflowY: 'auto'}}><FormGroup>
                     {this.state.sitesGroup.sitesList.map((site, siteIndex) =>
                         <FormControlLabel
                             control={
@@ -76,7 +76,7 @@ class SitesGroup extends React.Component {
 
                         />
                     )}
-                    </FormGroup>
+                    </FormGroup></div>
                 </CardContent>
                 <CardActions>
                     <Button size="small" onClick={this.props.deleteSitesGroup}>DELETE GROUP</Button>

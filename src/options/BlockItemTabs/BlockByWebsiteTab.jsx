@@ -5,7 +5,6 @@ class BlockByWebsiteTab extends React.Component {
     render() {
         return (
             <div>
-                block by website
                 {<BlockItemBaseTab allowCreateNewGroups={true} blockTypeToShow="website" />}
             </div>
         );
