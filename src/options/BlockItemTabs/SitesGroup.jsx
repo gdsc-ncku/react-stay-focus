@@ -60,6 +60,7 @@ class SitesGroup extends React.Component {
                     {this.state.sitesGroup.sitesList.map((site, siteIndex) =>
                         <FormControlLabel
                             control={
+                            <>
                             <Switch className='md-primary' checked={site.enabled}
                                 onChange={() => {
                                     let sitesGroup = this.state.sitesGroup;
@@ -67,8 +68,12 @@ class SitesGroup extends React.Component {
                                     this.setState({sitesGroup: sitesGroup}, () => {
                                         this.props.storeWebsites();
                                     });
-                                }}/>}
+                                }}/>
+                            <Button size="small" onClick={this.props.deleteSite}>delete</Button>
+                            </>
+                            }
                                 label={this.truncateSiteUrl(site.url)}
+
                         />
                     )}
                     </FormGroup>
