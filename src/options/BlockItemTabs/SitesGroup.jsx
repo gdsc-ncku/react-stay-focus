@@ -28,7 +28,7 @@ class SitesGroup extends React.Component {
     render() {
         return (
             <div className="site-group">
-            <Card style={{borderRadius: '4px', margin: '4px', height: '500px'}}>
+            <Card style={{borderRadius: '4px', margin: '10px', height: '500px'}}>
                 
                 <CardHeader className="card-header" title={this.state.sitesGroup.groupName} 
                             action={
