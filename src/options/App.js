@@ -162,8 +162,14 @@ export default class App extends Component {
                     </div>
                   )}
 
+                  {this.state.selectedTab == "block-by-regex-tab" && (
+                    <div>
+                      <BlockByRegexTab/>
+                    </div>
+                  )}
+
                   {this.state.selectedTab == "settings-tab" && (
-                    <div>test</div>
+                    <div>setting</div>
                   )}
               </Box>
           </Box>
