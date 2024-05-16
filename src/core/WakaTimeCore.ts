@@ -127,6 +127,7 @@ class WakaTimeCore {
       whitelist: '',
     });
     if (items.loggingEnabled === true) {
+      console.log('allGood');
       await changeExtensionState('allGood');
 
       let newState = '';

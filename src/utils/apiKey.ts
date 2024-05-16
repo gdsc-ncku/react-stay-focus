@@ -13,6 +13,7 @@ export default function apiKeyInvalid(key?: string): string {
 }
 
 export async function getApiKey(): Promise<string> {
+  console.log("getting ApiKey");
   const storage = await browser.storage.sync.get({
     apiKey: config.apiKey,
   });

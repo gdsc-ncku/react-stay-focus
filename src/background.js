@@ -12,6 +12,10 @@ import {localStorage} from "./chromeApiHelpers";
 // import {handle103To104Upgrade} from "./Migration/upgrades";
 import {skippedUrls} from "./constants";
 
+import browser from 'webextension-polyfill';
+import WakaTimeCore from './core/WakaTimeCore';
+import { PostHeartbeatMessage } from './types/heartbeats';
+
 const chooseIconColor = () => {
     localStorage.get("active").then(active => {
         setIcon(active);
@@ -75,26 +79,22 @@ chrome.runtime.onInstalled.addListener((details) => {
     }
 })
 
-import browser from 'webextension-polyfill';
-import WakaTimeCore from './core/WakaTimeCore';
-import { PostHeartbeatMessage } from './types/heartbeats';
-
 // Add a listener to resolve alarms
-// browser.alarms.onAlarm.addListener(async (alarm) => {
-//   // |alarm| can be undefined because onAlarm also gets called from
-//   // window.setTimeout on old chrome versions.
-//   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-//   if (alarm && alarm.name == 'heartbeatAlarm') {
-//     // Checks if the user is online and if there are cached heartbeats requests,
-//     // if so then procedd to send these payload to wakatime api
-//     if (navigator.onLine) {
-//       await WakaTimeCore.sendCachedHeartbeatsRequest();
-//     }
-//   }
-// });
+browser.alarms.onAlarm.addListener(async (alarm) => {
+  // |alarm| can be undefined because onAlarm also gets called from
+  // window.setTimeout on old chrome versions.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (alarm && alarm.name == 'heartbeatAlarm') {
+    // Checks if the user is online and if there are cached heartbeats requests,
+    // if so then procedd to send these payload to wakatime api
+    if (navigator.onLine) {
+      await WakaTimeCore.sendCachedHeartbeatsRequest();
+    }
+  }
+});
 
 // Create a new alarm for sending cached heartbeats.
-// browser.alarms.create('heartbeatAlarm', { periodInMinutes: 2 });
+browser.alarms.create('heartbeatAlarm', { periodInMinutes: 2 });
 
 /**
  * Whenever a active tab is changed it records a heartbeat with that tab url.
@@ -102,6 +102,7 @@ import { PostHeartbeatMessage } from './types/heartbeats';
 browser.tabs.onActivated.addListener(async () => {
   console.log('recording a heartbeat - active tab changed');
   await WakaTimeCore.recordHeartbeat();
+  console.log('recored');
 });
 
 /**
@@ -152,7 +153,7 @@ const keepAlive = () => {
         console.log(platformInfo);
         console.log("keep alive");
       });
-    }, 2000);
+    }, 20000);
   };
 chrome.runtime.onStartup.addListener(keepAlive);
 keepAlive();

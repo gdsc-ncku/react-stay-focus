@@ -22,6 +22,7 @@
   "permissions": [
     "storage",
     "webNavigation",
-    "tabs"
+    "tabs", 
+    "alarms"
   ]
 }

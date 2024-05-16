@@ -52,7 +52,7 @@ export interface Config {
   /**
    * API key use to query wakatime  api
    */
-  apiKey: '';
+  apiKey: ''; //api key for test
   apiUrl: string;
   colors: Colors;
   /**
@@ -118,7 +118,7 @@ const config: Config = {
     },
   },
 
-  apiKey: '',
+  apiKey: '', //api key for testing
 
   apiUrl: process.env.API_URL ?? 'https://api.wakatime.com/api/v1',
 

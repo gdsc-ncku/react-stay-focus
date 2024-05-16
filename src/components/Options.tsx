@@ -203,7 +203,7 @@ export default function Options(): JSX.Element {
                 className={`form-control ${isApiKeyValid ? '' : 'is-invalid'}`}
                 placeholder="API key"
                 value={state.apiKey}
-                onChange={(e) => setState({ ...state, apiKey: e.target.value })}
+                onChange={(e) => setState({ ...state, apiKey: e.target.value })} //api key html
               />
             </div>
 
