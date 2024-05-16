@@ -168,6 +168,7 @@ class SettingsTab extends Component {
                         }}
                         />
                     </LocalizationProvider>
+                    </Card>
 
             <div>
                 <FormControl sx={{ m: 1, width: 300 }}>
@@ -190,20 +191,8 @@ class SettingsTab extends Component {
                 </Select>
                 </FormControl>
             </div>
+
             <Card>
-
-            </Card>
-                {this.state.isResetButtonActive && (
-                    <div className="md-dialog-confirm" style={{display: 'block'}}>
-                        <div className="md-title">Are you sure you want to reset the data?</div>
-                        <div className="md-content">This will make all your settings and websites return to their initial values.</div>
-                        <button className="md-confirm" onClick={() => this.onResetConfirm()}>Yes</button>
-                        <button className="md-cancel" onClick={() => this.setState({ isResetButtonActive: false })}>No</button>
-                    </div>
-                )}
-                </Card>
-
-                <Card>
                 <FormControlLabel control={
                         <Switch type="checkbox" className="md-menu-content-right-end md-primary"
                         checked={this.state.settings.allowFunnyGoBackImages} 
@@ -215,10 +204,19 @@ class SettingsTab extends Component {
                        }));
                        }}/>
                     } label="Show funny images to go back to work" />
-                </Card>
+            </Card>
 
             <Card>
                 <Button variant="contained" onClick={() => this.setState({isResetButtonActive : true})}>Reset Data</Button>
+                
+                {this.state.isResetButtonActive && (
+                    <div className="md-dialog-confirm" style={{display: 'block'}}>
+                        <div className="md-title">Are you sure you want to reset the data?</div>
+                        <div className="md-content">This will make all your settings and websites return to their initial values.</div>
+                        <button className="md-confirm" onClick={() => {this.onResetConfirm(); this.setState({ isResetButtonActive: false })}}>Yes</button>
+                        <button className="md-cancel" onClick={() => this.setState({ isResetButtonActive: false })}>No</button>
+                    </div>
+                )}
             </Card>
             </div>
         );

@@ -170,7 +170,7 @@ export default class App extends Component {
 
                   {this.state.selectedTab == "settings-tab" && (
                     <div>
-                      <SettingsTab/>
+                      <SettingsTab reloadData={this.loadData}/>
                     </div>
                   )}
               </Box>
