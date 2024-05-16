@@ -199,6 +199,20 @@ class SettingsTab extends Component {
                     </div>
                 )}
                 </Card>
+
+                <Card>
+                <FormControlLabel control={
+                        <Switch type="checkbox" className="md-menu-content-right-end md-primary"
+                        checked={this.state.settings.allowFunnyGoBackImages} 
+                        onChange={() => {this.setState(prevState => ({
+                           settings: {
+                               ...prevState.settings,
+                               allowFunnyGoBackImages : !prevState.settings.allowFunnyGoBackImages
+                           }
+                       }));
+                       }}/>
+                    } label="Show funny images to go back to work" />
+                </Card>
             </div>
         );
     }
