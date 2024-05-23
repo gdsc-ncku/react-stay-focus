@@ -13,6 +13,16 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Card from '@mui/material/Card';
 import Switch from '@mui/material/Switch';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { InputLabel, Select, MenuItem } from '@material-ui/core';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Checkbox from '@mui/material/Checkbox';
+import ListItemText from '@mui/material/ListItemText';
+import { Button } from 'react-md';
+
 
 class SettingsTab extends Component {
     constructor(props) {
@@ -51,8 +61,19 @@ class SettingsTab extends Component {
         this.saveSettings()
     }
 
+    days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    handleChange = (event) => {
+        this.setState((prevState) => ({settings: {
+          ...prevState.settings,
+          workHours: {
+              ...prevState.settings.workHours,
+              days: event.target.value
+          }
+      }}));
+      };
+
     render() {
-        const { settings, isResetButtonActive } = this.state;
 
         return (
             <div>
@@ -73,31 +94,130 @@ class SettingsTab extends Component {
                             <FormControlLabel value="click-button" control={<Radio />} label="Click a Button" />
                         </RadioGroup>
                      </FormControl>
-                    {settings.lock.type === 'question' && (
+                    {this.state.settings.lock.type === 'question' && (
                         <MdColumn>
                             <label>Number of tries before showing answer</label>
-                            <input type="number" min="1" value={settings.lock.questionNumberOfTries} onChange={(e) => this.setState({ settings: {...settings, lock: {...settings.lock, questionNumberOfTries: parseInt(e.target.value)}} })} />
+                            <input type="number" min="1" value={this.state.settings.lock.questionNumberOfTries} onChange={(e) => this.setState({ settings: {...settings, lock: {...settings.lock, questionNumberOfTries: parseInt(e.target.value)}} })} />
                         </MdColumn>
                     )}
                     {/* Similar rendering logic for other lock types */}
                 </Card>
-
-                {/* Similar rendering logic for other sections */}
+                    
+                <Card>
 
                     <h4>Working Days and Hours
                         {/* <Tooltip>
                         Specifying working hours, so the websites will be blocked in these days/hours
                         </Tooltip> */}
                     </h4>
+                    <NoteBlock>
+                         Note: You have to activate the tool too, to make it works in working hours/days
+                    </NoteBlock>
+                    
+                    <FormControlLabel control={
+                        <Switch type="checkbox" className="md-menu-content-right-end md-primary"
+                        checked={this.state.settings.workHours.enableWorkHours} 
+                        onChange={() => {this.setState(prevState => ({
+                           settings: {
+                               ...prevState.settings,
+                               workHours: {
+                                   ...prevState.settings.workHours,
+                                   enableWorkHours: !prevState.settings.workHours.enableWorkHours
+                               }
+                           }
+                       }));
+                       }}/>
+                    } label="Active?" />
 
-                {isResetButtonActive && (
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        From:
+                        <TimePicker
+                        label="Uncontrolled picker"
+                        defaultValue={dayjs('2022-04-17T08:00')}
+                        disabled={!this.state.settings.workHours.enableWorkHours}
+                        value={dayjs(this.state.settings.workHours.startTime, "hh:mm A")}
+                        onChange={(v) => {
+                            this.setState(prevState => ({
+                                settings: {
+                                    ...prevState.settings,
+                                    workHours: {
+                                        ...prevState.settings.workHours,
+                                        startTime: v
+                                    }
+                                }
+                            }));
+                        }}
+                        />
+
+                        To:
+                        <TimePicker
+                        label="Uncontrolled picker"
+                        defaultValue={dayjs('2022-04-17T08:00')}
+                        disabled={!this.state.settings.workHours.enableWorkHours}
+                        value={dayjs(this.state.settings.workHours.endTime, "hh:mm A")}
+                        onChange={(v) => {
+                            this.setState(prevState => ({
+                                settings: {
+                                    ...prevState.settings,
+                                    workHours: {
+                                        ...prevState.settings.workHours,
+                                        endTime: v
+                                    }
+                                }
+                            }));
+                        }}
+                        />
+                    </LocalizationProvider>
+                    </Card>
+
+            <div>
+                <FormControl sx={{ m: 1, width: 300 }}>
+                <InputLabel id="working-days-label">Working Days</InputLabel>
+                <Select
+                    labelId="working-days-label"
+                    id="working-days"
+                    multiple
+                    value={this.state.settings.workHours.days}
+                    onChange={this.handleChange}
+                    input={<OutlinedInput label="Working Days" />}
+                    renderValue={(selected) => selected.join(', ')}
+                >
+                    {this.days.map((day, index) => (
+                    <MenuItem key={index} value={day}>
+                        <Checkbox checked={this.state.settings.workHours.days.indexOf(day) > -1} />
+                        <ListItemText primary={day} />
+                    </MenuItem>
+                    ))}
+                </Select>
+                </FormControl>
+            </div>
+
+            <Card>
+                <FormControlLabel control={
+                        <Switch type="checkbox" className="md-menu-content-right-end md-primary"
+                        checked={this.state.settings.allowFunnyGoBackImages} 
+                        onChange={() => {this.setState(prevState => ({
+                           settings: {
+                               ...prevState.settings,
+                               allowFunnyGoBackImages : !prevState.settings.allowFunnyGoBackImages
+                           }
+                       }));
+                       }}/>
+                    } label="Show funny images to go back to work" />
+            </Card>
+
+            <Card>
+                <Button variant="contained" onClick={() => this.setState({isResetButtonActive : true})}>Reset Data</Button>
+                
+                {this.state.isResetButtonActive && (
                     <div className="md-dialog-confirm" style={{display: 'block'}}>
                         <div className="md-title">Are you sure you want to reset the data?</div>
                         <div className="md-content">This will make all your settings and websites return to their initial values.</div>
-                        <button className="md-confirm" onClick={() => this.onResetConfirm()}>Yes</button>
+                        <button className="md-confirm" onClick={() => {this.onResetConfirm(); this.setState({ isResetButtonActive: false })}}>Yes</button>
                         <button className="md-cancel" onClick={() => this.setState({ isResetButtonActive: false })}>No</button>
                     </div>
                 )}
+            </Card>
             </div>
         );
     }
