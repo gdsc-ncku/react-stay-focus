@@ -27,6 +27,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import UnlockPage from "./unlock/UnlockPage";
+import WakaTime from "../components/WakaTime";
 // import SocialMediaShare from "../sharedComponents/SocialMediaShare";
 
 export default class App extends Component {
@@ -185,7 +186,9 @@ export default class App extends Component {
             </Box>
           </Box>
         )}
+        <WakaTime />
       </div>
+      
     )
   }
 }

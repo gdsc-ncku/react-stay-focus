@@ -82,10 +82,18 @@ class WakaTimeCore {
         currentUserApiEndPoint: config.currentUserApiEndPoint,
       });
 
-      const apiKeyResponse: AxiosResponse<ApiKeyPayload> = await axios.post(
-        `${items.apiUrl}${items.currentUserApiEndPoint}/get_api_key`,
-      );
-      return apiKeyResponse.data.data.api_key;
+      const response = await fetch('http://localhost:8000/api/users/api_key', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data.api_key;
     } catch (err: unknown) {
       return '';
     }
@@ -114,6 +122,7 @@ class WakaTimeCore {
    */
   async recordHeartbeat(payload = {}): Promise<void> {
     const apiKey = await getApiKey();
+    console.log('apiKey', apiKey);
     if (!apiKey) {
       return changeExtensionState('notLogging');
     }
@@ -416,6 +425,7 @@ class WakaTimeCore {
    */
   async sendCachedHeartbeatsRequest(): Promise<void> {
     const apiKey = await getApiKey();
+    console.log('apiKey', apiKey);
     if (!apiKey) {
       return changeExtensionState('notLogging');
     }
