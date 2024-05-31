@@ -23,6 +23,7 @@
     "storage",
     "webNavigation",
     "tabs", 
-    "alarms"
+    "alarms", 
+    "http://localhost:8000/"
   ]
 }
