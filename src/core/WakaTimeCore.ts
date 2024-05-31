@@ -83,17 +83,17 @@ class WakaTimeCore {
       });
 
       const response = await fetch('http://localhost:8000/api/users/api_key', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
         }
-        const data = await response.json();
-        return data.api_key;
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      return data.api_key;
     } catch (err: unknown) {
       return '';
     }
@@ -176,40 +176,42 @@ class WakaTimeCore {
       // Checks dev websites
       const project = generateProjectFromDevSites(url);
 
-      if (items.loggingStyle == 'blacklist') {
-        if (!contains(url, items.blacklist as string)) {
-          await this.sendHeartbeat(
-            {
-              hostname: items.hostname as string,
-              project,
-              url,
-            },
-            apiKey,
-            payload,
-          );
-        } else {
-          await changeExtensionState('blacklisted');
-          console.log(`${url} is on a blacklist.`);
-        }
-      }
+      // if (items.loggingStyle == 'blacklist') {
+      //   if (!contains(url, items.blacklist as string)) {
+      //     await this.sendHeartbeat(
+      //       {
+      //         hostname: items.hostname as string,
+      //         project,
+      //         url,
+      //       },
+      //       apiKey,
+      //       payload,
+      //     );
+      //   } else {
+      //     await changeExtensionState('blacklisted');
+      //     console.log(`${url} is on a blacklist.`);
+      //   }
+      // }
 
-      if (items.loggingStyle == 'whitelist') {
-        const heartbeat = this.getHeartbeat(url, items.whitelist as string);
-        if (heartbeat.url) {
-          await this.sendHeartbeat(
-            {
-              ...heartbeat,
-              hostname: items.hostname as string,
-              project: heartbeat.project ?? project,
-            },
-            apiKey,
-            payload,
-          );
-        } else {
-          await changeExtensionState('whitelisted');
-          console.log(`${url} is not on a whitelist.`);
-        }
-      }
+      // if (items.loggingStyle == 'whitelist') {
+      // const heartbeat = this.getHeartbeat(url, items.whitelist as string);
+      const heartbeat = await this.getCurrentSendHeartbeat();
+      // if (heartbeat.url) {
+      await this.sendHeartbeat(
+        // {
+        //   ...heartbeat,
+        //   // hostname: items.hostname as string,
+        //   // project: heartbeat.project ?? project,
+        // },
+        heartbeat,
+        apiKey,
+        payload,
+      );
+      // } else {
+      //   await changeExtensionState('whitelisted');
+      //   console.log(`${url} is not on a whitelist.`);
+      // }
+      // }
     }
   }
 
@@ -297,28 +299,68 @@ class WakaTimeCore {
   ): Promise<void> {
     let payload;
 
-    const loggingType = await this.getLoggingType();
-    // Get only the domain from the entity.
-    // And send that in heartbeat
-    if (loggingType == 'domain') {
-      heartbeat.url = getDomainFromUrl(heartbeat.url);
-      payload = await this.preparePayload(heartbeat, 'domain');
-      await this.sendPostRequestToApi(
-        { ...payload, ...navigationPayload },
-        apiKey,
-        heartbeat.hostname,
-      );
-    }
-    // Send entity in heartbeat
-    else if (loggingType == 'url') {
-      payload = await this.preparePayload(heartbeat, 'url');
-      await this.sendPostRequestToApi(
-        { ...payload, ...navigationPayload },
-        apiKey,
-        heartbeat.hostname,
-      );
+    // const loggingType = await this.getLoggingType();
+    // // Get only the domain from the entity.
+    // // And send that in heartbeat
+    // if (loggingType == 'domain') {
+    //   heartbeat.url = getDomainFromUrl(heartbeat.url);
+    //   payload = await this.preparePayload(heartbeat, 'domain');
+    //   await this.sendPostRequestToApi(
+    //     { ...payload, ...navigationPayload },
+    //     apiKey,
+    //     heartbeat.hostname,
+    //   );
+    // }
+    // // Send entity in heartbeat
+    // else if (loggingType == 'url') {
+    //   payload = await this.preparePayload(heartbeat, 'url');
+    //   await this.sendPostRequestToApi(
+    //     { ...payload, ...navigationPayload },
+    //     apiKey,
+    //     heartbeat.hostname,
+    //   );
+    // }
+    payload = await this.getCurrentSendHeartbeat();
+    await this.sendPostRequestToApi(
+      { ...payload },
+      apiKey,
+      "",
+    );
+  }
+
+  async getCurrentSendHeartbeat(): Promise<SendHeartbeat> {
+    const browser = this.getBrowserName(); // get the browser name
+    const user_agent = navigator.userAgent; // get the user agent string
+    const time = new Date(); // get the current time
+
+    // Use the chrome.tabs API to get the current tab's URL
+    const tabs = await new Promise<chrome.tabs.Tab[]>((resolve, reject) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(tabs);
+        }
+      });
+    });
+
+    if (tabs[0] && tabs[0].url) {
+      const url = new URL(tabs[0].url);
+      const domain = url.hostname; // extract domain from URL
+      const path = url.pathname; // extract path from URL
+
+      return {
+        browser,
+        domain,
+        path,
+        user_agent,
+        time,
+      };
+    } else {
+      throw new Error('No active tab found or URL is undefined');
     }
   }
+
 
   /**
    * Returns a promise with logging type variable.
@@ -334,39 +376,49 @@ class WakaTimeCore {
     return items.loggingType;
   }
 
-  /**
-   * Creates payload for the heartbeat and returns it as JSON.
-   *
-   * @param heartbeat
-   * @param type
-   * @param debug
-   * @returns {*}
-   * @private
-   */
-  async preparePayload(heartbeat: SendHeartbeat, type: string): Promise<Record<string, unknown>> {
-    const os = await this.getOperatingSystem();
-    let browserName = 'chrome';
-    let userAgent;
+  // /**
+  //  * Creates payload for the heartbeat and returns it as JSON.
+  //  *
+  //  * @param heartbeat
+  //  * @param type
+  //  * @param debug
+  //  * @returns {*}
+  //  * @private
+  //  */
+  // async preparePayload(heartbeat: SendHeartbeat, type: string): Promise<Record<string, unknown>> {
+  //   const os = await this.getOperatingSystem();
+  //   let browserName = 'chrome';
+  //   let userAgent;
+  //   if (IS_FIREFOX) {
+  //     browserName = 'firefox';
+  //     userAgent = navigator.userAgent.match(/Firefox\/\S+/g)![0];
+  //   } else if (IS_EDGE) {
+  //     browserName = 'edge';
+  //     userAgent = navigator.userAgent;
+  //   } else {
+  //     userAgent = navigator.userAgent.match(/Chrome\/\S+/g)![0];
+  //   }
+  //   const payload: Record<string, unknown> = {
+  //     entity: heartbeat.url,
+  //     time: moment().format('X'),
+  //     type: type,
+  //     user_agent: `${userAgent} ${os} ${browserName}-wakatime/${config.version}`,
+  //   };
+
+  //   payload.project = heartbeat.project ?? '<<LAST_PROJECT>>';
+  //   payload.branch = heartbeat.branch ?? '<<LAST_BRANCH>>';
+
+  //   return payload;
+  // }
+
+  getBrowserName(): string {
     if (IS_FIREFOX) {
-      browserName = 'firefox';
-      userAgent = navigator.userAgent.match(/Firefox\/\S+/g)![0];
+      return 'firefox';
     } else if (IS_EDGE) {
-      browserName = 'edge';
-      userAgent = navigator.userAgent;
+      return 'edge';
     } else {
-      userAgent = navigator.userAgent.match(/Chrome\/\S+/g)![0];
+      return 'chrome';
     }
-    const payload: Record<string, unknown> = {
-      entity: heartbeat.url,
-      time: moment().format('X'),
-      type: type,
-      user_agent: `${userAgent} ${os} ${browserName}-wakatime/${config.version}`,
-    };
-
-    payload.project = heartbeat.project ?? '<<LAST_PROJECT>>';
-    payload.branch = heartbeat.branch ?? '<<LAST_BRANCH>>';
-
-    return payload;
   }
 
   getOperatingSystem(): Promise<string> {
@@ -397,6 +449,9 @@ class WakaTimeCore {
 
       const request: RequestInit = {
         body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+        },
         credentials: 'omit',
         method: 'POST',
       };
