@@ -8,30 +8,42 @@ export interface HeartBeatsPayload {
 }
 
 export interface Datum {
-  branch: string;
-  category: string;
-  created_at: string;
-  cursorpos: null;
-  dependencies: string;
   entity: string;
-  id: string;
-  is_write: boolean;
-  language: string;
-  lineno: null;
-  lines: number;
-  machine_name_id: string;
-  project: string;
-  time: number;
   type: string;
-  user_agent_id: string;
-  user_id: string;
+  category: string;
+  browser: string;
+  domain: string;
+  path: string;
+  // branch: string;
+  // created_at: string;
+  // cursorpos: null;
+  // dependencies: string;
+  // id: string;
+  // is_write: boolean;
+  // language: string;
+  // lineno: null;
+  // lines: number;
+  // machine_name_id: string;
+  // project: string;
+  user_agent: string;
+  time: Date;
+  // type: string;
+  // user_id: string;
 }
 
 export interface SendHeartbeat {
-  branch: string | null;
-  hostname: string;
-  project: string | null;
-  url: string;
+  // branch: string | null;
+  // hostname: string;
+  // project: string | null;
+  // url: string;
+  // entity: string;
+  // type: string;
+  // category: string;
+  browser: string; // which browser is being used
+  domain: string; // domain of current page
+  path: string; // path of current page
+  user_agent: string; // user agent of current browser
+  time: Date;
 }
 
 export interface ProjectDetails {
