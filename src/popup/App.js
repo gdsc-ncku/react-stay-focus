@@ -3,7 +3,7 @@ import { getFlatListOfWebsites, getHostNameFromStringUrl, isValidURL, setIcon } 
 import { getChromeActiveTab, localStorage, openChromeNewTab } from "../chromeApiHelpers";
 import SharedCard from "../sharedComponents/SharedCard";
 import { getSiteGroupStructure, getSiteStructure } from "../dataHelpers/SitesGroup";
-import { Switch, Button, Card, Badge } from '@mui/material';
+import { Switch, Button, Card, Badge, Box, TextField } from '@mui/material';
 // import SocialMediaShare from "../sharedComponents/SocialMediaShare";
 
 import styled from 'styled-components';
@@ -23,7 +23,9 @@ export default class App extends Component {
             active: true,
             website: "",
             isLocked: false,
-            websiteIsAddedBefore: false
+            websiteIsAddedBefore: false //, 
+            // apiKeyLocal: "", 
+            // apiKey: "NULL"
         };
     }
     componentDidMount() {
@@ -39,6 +41,11 @@ export default class App extends Component {
         localStorage.get("settings").then(settings => {
           this.setState({ isLocked: (settings.lock.type !== "none") })
         })
+        // localStorage.get("apiKey").then(data => {
+        //     this.setState({ apiKey: data})
+        // }).catch((error) => {
+        //     // 在這裡可以處理錯誤情況
+        // });
         this.setWebsiteName()
     };
 
@@ -83,6 +90,11 @@ export default class App extends Component {
         this.setState({active: !active});
     }
 
+    setApikey = (apiKey) => {
+        localStorage.set("apiKey", apiKey);
+        this.setState({apiKey: apiKey});
+    }
+
     render() {
     return (
         <div>
@@ -111,7 +123,7 @@ export default class App extends Component {
                         )
                     }
                 </SharedCard>
-                <SharedCard>
+                {/* <SharedCard>
                     {isValidURL && (
                         <div className="main-row">
                             <div><b>Website: </b>{this.websiteName}</div>
@@ -127,7 +139,19 @@ export default class App extends Component {
                             )}
                     </div>
                     )}
-                </SharedCard>
+                </SharedCard> */}
+                {/* <Box sx={{ display: 'flex' }}>
+                    <TextField 
+                        label={"Api Key: " + this.state.apiKey}
+                        value={this.state.apiKeyLocal}
+                        onChange={(e) => this.setState({apiKeyLocal : e.target.value})}
+                        variant="standard"
+                        onKeyUp={(e) => {
+                            if (e.key === 'Enter') {
+                                this.setApikey(e.target.value);
+                            }
+                        }} />   
+                </Box> */}
             </main>
         </div>
         
