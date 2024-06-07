@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import SharedCard from '../sharedComponents/SharedCard';
+global.browser = require('webextension-polyfill');
 // import SocialMediaShare from '../sharedComponents/SocialMediaShare';
 
 async function fetchAndStoreApiKey() {
@@ -16,8 +17,11 @@ async function fetchAndStoreApiKey() {
         }
         const data = await response.json();
         const apiKey = data.api_key; // Ensure the key in the response matches this name
+        console.log('API Key fetched:', apiKey);
+        await browser.storage.sync.set({ justForTest: "123" });
+        console.log('API Key stored successfully!', apiKey);
         await browser.storage.sync.set({ apiKey: apiKey });
-        console.log('API Key stored successfully!');
+        console.log('API Key stored successfully!', apiKey);
     } catch (error) {
         console.error('Error fetching or storing API key:', error);
     }
