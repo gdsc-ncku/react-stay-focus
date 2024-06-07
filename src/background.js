@@ -55,6 +55,28 @@ const checkIfCanEnterWebsite = info => {
     }
 };
 
+const getUsage = (siteUrl) => {
+  let min = 1;
+  let max = 1000;
+  let randomNum = Math.floor(Math.random() * (max - min) + min);
+  return randomNum;
+}
+
+const updateUsages = () => {
+  localStorage.get("sitesGroups").then(sitesGroups => {
+    console.log(sitesGroups);
+    for (let sitesGroup of sitesGroups) {
+      if (sitesGroup.sitesList.length === 0){
+        continue;
+      }
+      for (let list of sitesGroup.sitesList) {
+        let usage = getUsage(list.url);
+        localStorage.set(list.url, usage);
+      }
+   }
+  });
+}
+
 chrome.webNavigation.onCommitted.addListener(checkIfCanEnterWebsite);
 chrome.webNavigation.onCommitted.addListener(chooseIconColor);
 
@@ -153,7 +175,12 @@ const keepAlive = () => {
         console.log(platformInfo);
         console.log("keep alive");
       });
-    }, 20000);
+      updateUsages();
+
+      localStorage.get(null).then(data => {
+        console.log(data);
+      });
+    }, 2000);
   };
 chrome.runtime.onStartup.addListener(keepAlive);
 keepAlive();
