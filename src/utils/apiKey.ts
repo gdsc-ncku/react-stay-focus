@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import config from '../config/config';
+import { localStorage } from '../chromeApiHelpers'
 
 export default function apiKeyInvalid(key?: string): string {
   // check key is uuid
@@ -17,3 +18,10 @@ export async function getApiKey(): Promise<string> {
   const apiKey = storage.apiKey as string;
   return apiKey;
 }
+
+//changed
+// export async function getApiKey(): Promise<string> {
+//   const apiKey = await localStorage.get('apiKey')
+//   console.log('apiKey for dev', apiKey)
+//   return apiKey;
+// }
