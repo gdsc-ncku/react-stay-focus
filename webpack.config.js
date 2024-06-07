@@ -103,9 +103,9 @@ const config = {
       ]
     }),
     new webpack.DefinePlugin({
-      ['process.env.API_URL']: JSON.stringify('https://api.wakatime.com/api/v1'),
+      ['process.env.API_URL']: JSON.stringify('http://localhost:8000'),
       ['process.env.CURRENT_USER_API_URL']: JSON.stringify('/users/current'),
-      ['process.env.HEARTBEAT_API_URL']: JSON.stringify('/users/current/heartbeats'),
+      ['process.env.HEARTBEAT_API_URL']: JSON.stringify('/api/heartbeats'),
       ['process.env.LOGOUT_USER_URL']: JSON.stringify('https://wakatime.com/logout'),
       ['process.env.NODE_ENV']: JSON.stringify(isProd ? 'production' : 'development'),
       ['process.env.SUMMARIES_API_URL']: JSON.stringify('/users/current/summaries'),
