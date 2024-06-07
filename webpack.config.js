@@ -6,7 +6,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 // const { VueLoaderPlugin } = require('vue-loader');
 const { version } = require('./package.json');
 // const loader = require('mini-css-extract-plugin/types/loader');
-
+const arv = process.argv;
+const isProd = arv.mode !== 'development';
 const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + '/src',
@@ -21,17 +22,17 @@ const config = {
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.ts', '.tsx']
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use:  {
           loader: 'babel-loader', 
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
           }
       }
     },
@@ -101,6 +102,14 @@ const config = {
         },
       ]
     }),
+    new webpack.DefinePlugin({
+      ['process.env.API_URL']: JSON.stringify('https://api.wakatime.com/api/v1'),
+      ['process.env.CURRENT_USER_API_URL']: JSON.stringify('/users/current'),
+      ['process.env.HEARTBEAT_API_URL']: JSON.stringify('/users/current/heartbeats'),
+      ['process.env.LOGOUT_USER_URL']: JSON.stringify('https://wakatime.com/logout'),
+      ['process.env.NODE_ENV']: JSON.stringify(isProd ? 'production' : 'development'),
+      ['process.env.SUMMARIES_API_URL']: JSON.stringify('/users/current/summaries'),
+    })
   ],
 };
 

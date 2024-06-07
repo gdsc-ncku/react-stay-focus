@@ -11,6 +11,8 @@ export const localStorage = {
             chrome.storage.local.get(key, data => {
                 if (data[key] !== undefined) {
                     resolve(data[key]);
+                } else if (key === null){
+                    resolve(data);
                 } else {
                     reject("");
                 }
@@ -23,7 +25,11 @@ export const localStorage = {
      * @param value {any}
      */
     set(key, value) {
-        chrome.storage.local.set({[key]: value});
+        if (key === null) {
+            chrome.storage.local.set(value);
+        } else {
+            chrome.storage.local.set({[key]: value});
+        }
     }
 }
 
